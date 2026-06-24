@@ -1,0 +1,6 @@
+@TramPocketBackend_HostAddress = http://localhost:5074
+
+GET {{TramPocketBackend_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
