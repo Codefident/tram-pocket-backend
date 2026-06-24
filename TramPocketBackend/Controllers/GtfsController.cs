@@ -9,31 +9,22 @@ namespace TramPocketBackend.Controllers;
 [ApiController]
 public class GtfsController(TransitState transitState) : ControllerBase
 {
-    [HttpGet("stop/{id}")]
+    [HttpGet("stop/id/{id}")]
     [ProducesResponseType(typeof(StopDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    [OpenApiOperation("Get tram stop by ID", "")]
-    public IActionResult GetStop(string id)
+    [OpenApiOperation("Get tram stop by ID", "Example: stop_252_42019")]
+    public IActionResult GetStopById(string id)
     {
         if (!transitState.StopsById.TryGetValue(id, out var stop)) return NotFound();
+        return Ok(stop.ToDto());
+    }
 
-        var stopDto = new StopDto
-        {
-            StopId = stop.StopId,
-            StopCode = stop.StopCode,
-            StopName = stop.StopName,
-            StopDesc = stop.StopDesc,
-            StopLat = stop.StopLat,
-            StopLon = stop.StopLon,
-            ZoneId = stop.ZoneId,
-            StopUrl = stop.StopUrl,
-            LocationType = stop.LocationType,
-            ParentStation = stop.ParentStation,
-            StopTimezone = stop.StopTimezone,
-            WheelchairBoarding = stop.WheelchairBoarding,
-            PlatformCode = stop.PlatformCode
-        };
-
-        return Ok(stopDto);
+    [HttpGet("stop/code/{code}")]
+    [ProducesResponseType(typeof(StopDto), StatusCodes.Status200OK)]
+    [OpenApiOperation("Get stop code by code", "Example: 119-01")]
+    public IActionResult GetStopByCode(string code)
+    {
+        if (!transitState.StopsByCode.TryGetValue(code, out var stop)) return NotFound();
+        return Ok(stop.ToDto());
     }
 }
