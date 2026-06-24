@@ -3,9 +3,9 @@ using TramPocketBackend.Models.Gtfs;
 
 namespace TramPocketBackend.Mappings.Gtfs;
 
-public sealed class TripMap : ClassMap<TripModel>
+public sealed class TripMappings : ClassMap<TripModel>
 {
-    public TripMap()
+    public TripMappings()
     {
         Map(m => m.TripId).Name("trip_id");
         Map(m => m.RouteId).Name("route_id");

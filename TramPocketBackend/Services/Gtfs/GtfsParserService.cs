@@ -39,7 +39,7 @@ public class GtfsParserService(ILogger<GtfsParserService> logger, IOptions<GtfsO
         var stopsById = new Dictionary<string, StopModel>();
         var stopsByCode = new Dictionary<string, StopModel>();
 
-        var stops = GetRecordsFromFile<StopMap, StopModel>("stops.txt");
+        var stops = GetRecordsFromFile<StopMappings, StopModel>("stops.txt");
         foreach (var stop in stops)
         {
             stopsById[stop.StopId] = stop;
@@ -55,7 +55,7 @@ public class GtfsParserService(ILogger<GtfsParserService> logger, IOptions<GtfsO
     {
         var routesById = new Dictionary<string, RouteModel>();
 
-        var routes = GetRecordsFromFile<RouteMap, RouteModel>("routes.txt");
+        var routes = GetRecordsFromFile<RouteMappings, RouteModel>("routes.txt");
         foreach (var route in routes) routesById[route.RouteId] = route;
 
         logger.LogInformation("Parsed {n} routes", routesById.Count);
@@ -66,7 +66,7 @@ public class GtfsParserService(ILogger<GtfsParserService> logger, IOptions<GtfsO
     {
         var tripsById = new Dictionary<string, TripModel>();
 
-        var trips = GetRecordsFromFile<TripMap, TripModel>("trips.txt");
+        var trips = GetRecordsFromFile<TripMappings, TripModel>("trips.txt");
         foreach (var trip in trips) tripsById[trip.TripId] = trip;
 
         logger.LogInformation("Parsed {n} trips", tripsById.Count);
@@ -81,7 +81,7 @@ public class GtfsParserService(ILogger<GtfsParserService> logger, IOptions<GtfsO
         var calendarDatesByServiceId = new Dictionary<string, List<CalendarDateModel>>();
         var calendarDatesByDate = new Dictionary<string, List<CalendarDateModel>>();
 
-        var calendarDates = GetRecordsFromFile<CalendarDateMap, CalendarDateModel>("calendar_dates.txt");
+        var calendarDates = GetRecordsFromFile<CalendarDateMappings, CalendarDateModel>("calendar_dates.txt");
         foreach (var calendarDate in calendarDates)
         {
             if (!calendarDatesByServiceId.ContainsKey(calendarDate.ServiceId))

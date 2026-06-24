@@ -3,9 +3,9 @@ using TramPocketBackend.Models.Gtfs;
 
 namespace TramPocketBackend.Mappings.Gtfs;
 
-public sealed class StopMap : ClassMap<StopModel>
+public sealed class StopMappings : ClassMap<StopModel>
 {
-    public StopMap()
+    public StopMappings()
     {
         Map(m => m.StopId).Name("stop_id");
         Map(m => m.StopCode).Name("stop_code");

@@ -3,9 +3,9 @@ using TramPocketBackend.Models.Gtfs;
 
 namespace TramPocketBackend.Mappings.Gtfs;
 
-public sealed class CalendarDateMap : ClassMap<CalendarDateModel>
+public sealed class CalendarDateMappings : ClassMap<CalendarDateModel>
 {
-    public CalendarDateMap()
+    public CalendarDateMappings()
     {
         Map(m => m.ServiceId).Name("service_id");
         Map(m => m.Date).Name("date");
