@@ -1,9 +1,10 @@
 using CsvHelper.Configuration;
 using TramPocketBackend.Models.Gtfs;
+using Route = TramPocketBackend.Models.Gtfs.Route;
 
 namespace TramPocketBackend.Mappings.Gtfs;
 
-public sealed class RouteMappings : ClassMap<RouteModel>
+public sealed class RouteMappings : ClassMap<Route>
 {
     public RouteMappings()
     {

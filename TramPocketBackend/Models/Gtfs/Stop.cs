@@ -1,6 +1,6 @@
 namespace TramPocketBackend.Models.Gtfs;
 
-public record StopModel
+public record Stop
 {
     public string StopId { get; init; } = string.Empty;
     public string StopCode { get; init; } = string.Empty;

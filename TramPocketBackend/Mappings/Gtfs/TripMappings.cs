@@ -3,7 +3,7 @@ using TramPocketBackend.Models.Gtfs;
 
 namespace TramPocketBackend.Mappings.Gtfs;
 
-public sealed class TripMappings : ClassMap<TripModel>
+public sealed class TripMappings : ClassMap<Trip>
 {
     public TripMappings()
     {

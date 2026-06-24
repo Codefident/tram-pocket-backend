@@ -6,6 +6,7 @@ using TramPocketBackend.Configuration;
 using TramPocketBackend.Mappings.Gtfs;
 using TramPocketBackend.Models;
 using TramPocketBackend.Models.Gtfs;
+using Route = TramPocketBackend.Models.Gtfs.Route;
 
 namespace TramPocketBackend.Services.Gtfs;
 
@@ -13,14 +14,14 @@ public class GtfsParserService(ILogger<GtfsParserService> logger, IOptions<GtfsO
 {
     private readonly string _gtfsExtractPath = Path.Combine(env.ContentRootPath, options.Value.ExtractPath);
 
-    public TransitStateDataModel Parse()
+    public TransitStateData Parse()
     {
         var stops = ParseStops();
         var routes = ParseRoutes();
         var trips = ParseTrips();
         var calendarDates = ParseCalendarDates();
 
-        return new TransitStateDataModel
+        return new TransitStateData
         {
             StopsById = stops.StopsById,
             StopsByCode = stops.StopsByCode,
@@ -32,14 +33,14 @@ public class GtfsParserService(ILogger<GtfsParserService> logger, IOptions<GtfsO
     }
 
     private (
-        Dictionary<string, StopModel> StopsById,
-        Dictionary<string, StopModel> StopsByCode
+        Dictionary<string, Stop> StopsById,
+        Dictionary<string, Stop> StopsByCode
         ) ParseStops()
     {
-        var stopsById = new Dictionary<string, StopModel>();
-        var stopsByCode = new Dictionary<string, StopModel>();
+        var stopsById = new Dictionary<string, Stop>();
+        var stopsByCode = new Dictionary<string, Stop>();
 
-        var stops = GetRecordsFromFile<StopMappings, StopModel>("stops.txt");
+        var stops = GetRecordsFromFile<StopMappings, Stop>("stops.txt");
         foreach (var stop in stops)
         {
             stopsById[stop.StopId] = stop;
@@ -51,22 +52,22 @@ public class GtfsParserService(ILogger<GtfsParserService> logger, IOptions<GtfsO
         return (stopsById, stopsByCode);
     }
 
-    private Dictionary<string, RouteModel> ParseRoutes()
+    private Dictionary<string, Route> ParseRoutes()
     {
-        var routesById = new Dictionary<string, RouteModel>();
+        var routesById = new Dictionary<string, Route>();
 
-        var routes = GetRecordsFromFile<RouteMappings, RouteModel>("routes.txt");
+        var routes = GetRecordsFromFile<RouteMappings, Route>("routes.txt");
         foreach (var route in routes) routesById[route.RouteId] = route;
 
         logger.LogInformation("Parsed {n} routes", routesById.Count);
         return routesById;
     }
 
-    private Dictionary<string, TripModel> ParseTrips()
+    private Dictionary<string, Trip> ParseTrips()
     {
-        var tripsById = new Dictionary<string, TripModel>();
+        var tripsById = new Dictionary<string, Trip>();
 
-        var trips = GetRecordsFromFile<TripMappings, TripModel>("trips.txt");
+        var trips = GetRecordsFromFile<TripMappings, Trip>("trips.txt");
         foreach (var trip in trips) tripsById[trip.TripId] = trip;
 
         logger.LogInformation("Parsed {n} trips", tripsById.Count);
@@ -74,22 +75,22 @@ public class GtfsParserService(ILogger<GtfsParserService> logger, IOptions<GtfsO
     }
 
     private (
-        Dictionary<string, List<CalendarDateModel>> CalendarDatesByServiceId,
-        Dictionary<string, List<CalendarDateModel>> CalendarDatesByDate
+        Dictionary<string, List<CalendarDate>> CalendarDatesByServiceId,
+        Dictionary<string, List<CalendarDate>> CalendarDatesByDate
         ) ParseCalendarDates()
     {
-        var calendarDatesByServiceId = new Dictionary<string, List<CalendarDateModel>>();
-        var calendarDatesByDate = new Dictionary<string, List<CalendarDateModel>>();
+        var calendarDatesByServiceId = new Dictionary<string, List<CalendarDate>>();
+        var calendarDatesByDate = new Dictionary<string, List<CalendarDate>>();
 
-        var calendarDates = GetRecordsFromFile<CalendarDateMappings, CalendarDateModel>("calendar_dates.txt");
+        var calendarDates = GetRecordsFromFile<CalendarDateMappings, CalendarDate>("calendar_dates.txt");
         foreach (var calendarDate in calendarDates)
         {
             if (!calendarDatesByServiceId.ContainsKey(calendarDate.ServiceId))
-                calendarDatesByServiceId[calendarDate.ServiceId] = new List<CalendarDateModel>();
+                calendarDatesByServiceId[calendarDate.ServiceId] = new List<CalendarDate>();
             calendarDatesByServiceId[calendarDate.ServiceId].Add(calendarDate);
 
             if (!calendarDatesByDate.ContainsKey(calendarDate.Date))
-                calendarDatesByDate[calendarDate.Date] = new List<CalendarDateModel>();
+                calendarDatesByDate[calendarDate.Date] = new List<CalendarDate>();
             calendarDatesByDate[calendarDate.Date].Add(calendarDate);
         }
 

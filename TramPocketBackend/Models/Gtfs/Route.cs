@@ -1,6 +1,6 @@
 namespace TramPocketBackend.Models.Gtfs;
 
-public record RouteModel
+public record Route
 {
     public string RouteId { get; set; } = string.Empty;
     public string AgencyId { get; set; } = string.Empty;

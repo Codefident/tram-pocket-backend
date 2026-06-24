@@ -3,7 +3,7 @@ using TramPocketBackend.Models.Gtfs;
 
 namespace TramPocketBackend.Mappings.Gtfs;
 
-public sealed class CalendarDateMappings : ClassMap<CalendarDateModel>
+public sealed class CalendarDateMappings : ClassMap<CalendarDate>
 {
     public CalendarDateMappings()
     {

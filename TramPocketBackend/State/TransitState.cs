@@ -2,15 +2,15 @@ using TramPocketBackend.Models;
 
 namespace TramPocketBackend.State;
 
-public sealed class TransitState : TransitStateDataModel
+public sealed class TransitState : TransitStateData
 {
-    public void UpdateData(TransitStateDataModel dataModel)
+    public void UpdateData(TransitStateData data)
     {
-        StopsById = dataModel.StopsById;
-        StopsByCode = dataModel.StopsByCode;
-        RoutesById = dataModel.RoutesById;
-        TripsById = dataModel.TripsById;
-        CalendarDatesByServiceId = dataModel.CalendarDatesByServiceId;
-        CalendarDatesByDate = dataModel.CalendarDatesByDate;
+        StopsById = data.StopsById;
+        StopsByCode = data.StopsByCode;
+        RoutesById = data.RoutesById;
+        TripsById = data.TripsById;
+        CalendarDatesByServiceId = data.CalendarDatesByServiceId;
+        CalendarDatesByDate = data.CalendarDatesByDate;
     }
 }

@@ -3,7 +3,7 @@ using TramPocketBackend.Models.Gtfs;
 
 namespace TramPocketBackend.Mappings.Gtfs;
 
-public sealed class StopMappings : ClassMap<StopModel>
+public sealed class StopMappings : ClassMap<Stop>
 {
     public StopMappings()
     {
