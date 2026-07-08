@@ -1,6 +1,6 @@
 namespace TramPocketBackend.Models.Gtfs;
 
-public abstract record StopTime
+public record StopTime
 {
     public string TripId { get; init; } = string.Empty;
     public string ArrivalTime { get; init; } = string.Empty;
