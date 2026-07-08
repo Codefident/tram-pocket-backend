@@ -3,9 +3,9 @@ using CsvHelper;
 using CsvHelper.Configuration;
 using Microsoft.Extensions.Options;
 using TramPocketBackend.Configuration;
-using TramPocketBackend.Mappings.Gtfs;
 using TramPocketBackend.Models;
 using TramPocketBackend.Models.Gtfs;
+using TramPocketBackend.Models.Gtfs.Mappings;
 using Route = TramPocketBackend.Models.Gtfs.Route;
 
 namespace TramPocketBackend.Services.Gtfs;

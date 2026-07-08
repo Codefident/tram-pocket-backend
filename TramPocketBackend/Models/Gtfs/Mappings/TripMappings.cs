@@ -1,7 +1,6 @@
 using CsvHelper.Configuration;
-using TramPocketBackend.Models.Gtfs;
 
-namespace TramPocketBackend.Mappings.Gtfs;
+namespace TramPocketBackend.Models.Gtfs.Mappings;
 
 public sealed class TripMappings : ClassMap<Trip>
 {

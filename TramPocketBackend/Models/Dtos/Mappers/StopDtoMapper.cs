@@ -1,6 +1,6 @@
 using TramPocketBackend.Models.Gtfs;
 
-namespace TramPocketBackend.Models.Dtos;
+namespace TramPocketBackend.Models.Dtos.Mappers;
 
 public static class StopDtoMapper
 {

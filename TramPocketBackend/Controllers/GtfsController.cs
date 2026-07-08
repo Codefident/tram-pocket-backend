@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using NSwag.Annotations;
 using TramPocketBackend.Models.Dtos;
+using TramPocketBackend.Models.Dtos.Mappers;
 using TramPocketBackend.State;
 
 namespace TramPocketBackend.Controllers;
@@ -21,7 +22,7 @@ public class GtfsController(TransitState transitState) : ControllerBase
 
     [HttpGet("stop/code/{code}")]
     [ProducesResponseType(typeof(StopDto), StatusCodes.Status200OK)]
-    [OpenApiOperation("Get stop code by code", "Example: 119-01")]
+    [OpenApiOperation("Get tram stop by code", "Example: 119-01")]
     public IActionResult GetStopByCode(string code)
     {
         if (!transitState.StopsByCode.TryGetValue(code, out var stop)) return NotFound();
