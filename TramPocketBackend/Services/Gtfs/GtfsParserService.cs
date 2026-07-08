@@ -6,6 +6,7 @@ using TramPocketBackend.Configuration;
 using TramPocketBackend.Models;
 using TramPocketBackend.Models.Gtfs;
 using TramPocketBackend.Models.Gtfs.Mappings;
+using TramPocketBackend.Utils;
 using Route = TramPocketBackend.Models.Gtfs.Route;
 
 namespace TramPocketBackend.Services.Gtfs;
@@ -20,6 +21,7 @@ public class GtfsParserService(ILogger<GtfsParserService> logger, IOptions<GtfsO
         var routes = ParseRoutes();
         var trips = ParseTrips();
         var calendarDates = ParseCalendarDates();
+        var stopTimes = ParseStopTimes();
 
         return new TransitStateData
         {
@@ -28,7 +30,10 @@ public class GtfsParserService(ILogger<GtfsParserService> logger, IOptions<GtfsO
             RoutesById = routes,
             TripsById = trips,
             CalendarDatesByServiceId = calendarDates.CalendarDatesByServiceId,
-            CalendarDatesByDate = calendarDates.CalendarDatesByDate
+            CalendarDatesByDate = calendarDates.CalendarDatesByDate,
+            StopTimesByTripId = stopTimes.StopTimesByTripId,
+            StopTimesByStopId = stopTimes.StopTimesByStopId,
+            StopTimesByStopTripId = stopTimes.StopTimesByStopTripId
         };
     }
 
@@ -96,6 +101,38 @@ public class GtfsParserService(ILogger<GtfsParserService> logger, IOptions<GtfsO
 
         logger.LogInformation("Parsed {n} calendar dates", calendarDates.Count);
         return (calendarDatesByServiceId, calendarDatesByDate);
+    }
+
+    private (
+        Dictionary<string, List<StopTime>> StopTimesByTripId,
+        Dictionary<string, List<StopTime>> StopTimesByStopId,
+        Dictionary<string, StopTime> StopTimesByStopTripId
+        ) ParseStopTimes()
+    {
+        var stopTimesByTripId = new Dictionary<string, List<StopTime>>();
+        var stopTimesByStopId = new Dictionary<string, List<StopTime>>();
+        var stopTimesByStopTripId = new Dictionary<string, StopTime>();
+
+        var stopTimes = GetRecordsFromFile<StopTimeMap, StopTime>("stop_times.txt");
+        foreach (var stopTime in stopTimes)
+        {
+            // Index by trip ID
+            if (!stopTimesByTripId.ContainsKey(stopTime.TripId))
+                stopTimesByTripId[stopTime.TripId] = new List<StopTime>();
+            stopTimesByTripId[stopTime.TripId].Add(stopTime);
+
+            // Index by stop ID
+            if (!stopTimesByStopId.ContainsKey(stopTime.StopId))
+                stopTimesByStopId[stopTime.StopId] = new List<StopTime>();
+            stopTimesByStopId[stopTime.StopId].Add(stopTime);
+
+            // Index by composite stop-trip ID
+            var compositeKey = GtfsUtils.CreateStopTripKey(stopTime.StopId, stopTime.TripId);
+            stopTimesByStopTripId[compositeKey] = stopTime;
+        }
+
+        logger.LogInformation("Parsed {n} stop times", stopTimes.Count);
+        return (stopTimesByTripId, stopTimesByStopId, stopTimesByStopTripId);
     }
 
     private List<TModel> GetRecordsFromFile<TMap, TModel>(string fileName) where TMap : ClassMap

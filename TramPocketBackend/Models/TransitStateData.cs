@@ -18,4 +18,9 @@ public class TransitStateData
     // calendar dates
     public Dictionary<string, List<CalendarDate>> CalendarDatesByServiceId { get; set; } = new();
     public Dictionary<string, List<CalendarDate>> CalendarDatesByDate { get; set; } = new();
+
+    // stop times
+    public Dictionary<string, List<StopTime>> StopTimesByTripId { get; set; } = new();
+    public Dictionary<string, List<StopTime>> StopTimesByStopId { get; set; } = new();
+    public Dictionary<string, StopTime> StopTimesByStopTripId { get; set; } = new();
 }

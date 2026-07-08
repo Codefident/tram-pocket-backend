@@ -10,6 +10,8 @@ builder.Services.AddControllers();
 builder.Services.AddHttpClient();
 builder.Services.Configure<GtfsOptions>(
     builder.Configuration.GetSection("Gtfs"));
+builder.Services.Configure<DeparturesOptions>(
+    builder.Configuration.GetSection("Departures"));
 builder.Services.AddHostedService<GtfsService>();
 builder.Services.AddSingleton<GtfsParserService>();
 builder.Services.AddSingleton<DataDirectoryInitializer>();

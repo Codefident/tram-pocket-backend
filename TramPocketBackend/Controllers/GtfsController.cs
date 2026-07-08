@@ -16,7 +16,8 @@ public class GtfsController(TransitState transitState) : ControllerBase
     [OpenApiOperation("Get tram stop by ID", "Example: stop_252_42019")]
     public IActionResult GetStopById(string id)
     {
-        if (!transitState.StopsById.TryGetValue(id, out var stop)) return NotFound();
+        var stop = transitState.GetStopById(id);
+        if (stop == null) return NotFound();
         return Ok(stop.ToDto());
     }
 
@@ -25,7 +26,8 @@ public class GtfsController(TransitState transitState) : ControllerBase
     [OpenApiOperation("Get tram stop by code", "Example: 119-01")]
     public IActionResult GetStopByCode(string code)
     {
-        if (!transitState.StopsByCode.TryGetValue(code, out var stop)) return NotFound();
+        var stop = transitState.GetStopByCode(code);
+        if (stop == null) return NotFound();
         return Ok(stop.ToDto());
     }
 }
