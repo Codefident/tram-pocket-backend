@@ -1,6 +1,8 @@
+using TramPocketBackend.Extensions;
 using TramPocketBackend.Models;
 using TramPocketBackend.Models.Gtfs;
 using TramPocketBackend.Utils;
+using Route = TramPocketBackend.Models.Gtfs.Route;
 
 namespace TramPocketBackend.State;
 
@@ -19,6 +21,8 @@ public sealed class TransitState : TransitStateData
         StopTimesByStopTripId = data.StopTimesByStopTripId;
     }
 
+    // stops getters
+
     public Stop? GetStopById(string id)
     {
         StopsById.TryGetValue(id, out var stop);
@@ -31,16 +35,18 @@ public sealed class TransitState : TransitStateData
         return stop;
     }
 
+    // stoptimes
+
     public List<StopTime> GetStopTimesByTripId(string tripId)
     {
         StopTimesByTripId.TryGetValue(tripId, out var stopTimes);
-        return stopTimes ?? new List<StopTime>();
+        return stopTimes ?? [];
     }
 
     public List<StopTime> GetStopTimesByStopId(string stopId)
     {
         StopTimesByStopId.TryGetValue(stopId, out var stopTimes);
-        return stopTimes ?? new List<StopTime>();
+        return stopTimes ?? [];
     }
 
     public StopTime? GetStopTime(string stopId, string tripId)
@@ -48,5 +54,47 @@ public sealed class TransitState : TransitStateData
         var compositeKey = GtfsUtils.CreateStopTripKey(stopId, tripId);
         StopTimesByStopTripId.TryGetValue(compositeKey, out var stopTime);
         return stopTime;
+    }
+
+    // trips
+
+    public Trip? GetTripById(string tripId)
+    {
+        TripsById.TryGetValue(tripId, out var trip);
+        return trip;
+    }
+
+    // routes
+
+    public Route? GetRouteById(string routeId)
+    {
+        RoutesById.TryGetValue(routeId, out var route);
+        return route;
+    }
+
+    // services
+
+    /// <summary>
+    ///     Returns ids of services, which are running this day.
+    /// </summary>
+    public HashSet<string> GetServicesIdsForDate(DateTime date)
+    {
+        var serviceIds = new HashSet<string>();
+
+        CalendarDatesByDate.TryGetValue(date.ConvertToGtfsCalendarDate(), out var calendarDates);
+        if (calendarDates == null) return serviceIds;
+
+        foreach (var calendarDate in calendarDates)
+            switch (calendarDate.ExceptionType)
+            {
+                case 1:
+                    serviceIds.Add(calendarDate.ServiceId);
+                    break;
+                case 2:
+                    serviceIds.Remove(calendarDate.ServiceId);
+                    break;
+            }
+
+        return serviceIds;
     }
 }

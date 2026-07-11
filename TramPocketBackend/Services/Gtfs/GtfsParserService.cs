@@ -131,6 +131,13 @@ public class GtfsParserService(ILogger<GtfsParserService> logger, IOptions<GtfsO
             stopTimesByStopTripId[compositeKey] = stopTime;
         }
 
+        foreach (var kvp in stopTimesByStopId)
+            kvp.Value.Sort((a, b) =>
+            {
+                var cmp = a.DepartureTime.CompareTo(b.DepartureTime);
+                return cmp != 0 ? cmp : string.Compare(a.TripId, b.TripId, StringComparison.Ordinal);
+            });
+
         logger.LogInformation("Parsed {n} stop times", stopTimes.Count);
         return (stopTimesByTripId, stopTimesByStopId, stopTimesByStopTripId);
     }

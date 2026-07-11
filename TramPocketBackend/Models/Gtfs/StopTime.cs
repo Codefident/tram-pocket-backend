@@ -3,8 +3,8 @@ namespace TramPocketBackend.Models.Gtfs;
 public record StopTime
 {
     public string TripId { get; init; } = string.Empty;
-    public string ArrivalTime { get; init; } = string.Empty;
-    public string DepartureTime { get; init; } = string.Empty;
+    public TimeSpan ArrivalTime { get; init; } = TimeSpan.Zero;
+    public TimeSpan DepartureTime { get; init; } = TimeSpan.Zero;
     public string StopId { get; init; } = string.Empty;
     public int StopSequence { get; init; }
     public string StopHeadsign { get; init; } = string.Empty;

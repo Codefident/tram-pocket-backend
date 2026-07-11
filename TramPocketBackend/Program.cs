@@ -1,5 +1,6 @@
 using TramPocketBackend.Configuration;
 using TramPocketBackend.Initializers;
+using TramPocketBackend.Services;
 using TramPocketBackend.Services.Gtfs;
 using TramPocketBackend.State;
 
@@ -14,6 +15,7 @@ builder.Services.Configure<DeparturesOptions>(
     builder.Configuration.GetSection("Departures"));
 builder.Services.AddHostedService<GtfsService>();
 builder.Services.AddSingleton<GtfsParserService>();
+builder.Services.AddSingleton<DeparturesService>();
 builder.Services.AddSingleton<DataDirectoryInitializer>();
 builder.Services.AddSingleton<TransitState>();
 
