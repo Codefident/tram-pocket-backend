@@ -19,64 +19,7 @@ public class GtfsService(
     private readonly string _gtfsZipPath = Path.Combine(env.ContentRootPath, options.Value.ZipPath);
     private readonly GtfsOptions _options = options.Value;
 
-    private bool GtfsFileExists()
-    {
-        return File.Exists(_gtfsZipPath);
-    }
-
-    private bool GtfsExtractedFilesExist()
-    {
-        return File.Exists(Path.Combine(_gtfsExtractPath, "stops.txt")) &&
-               File.Exists(Path.Combine(_gtfsExtractPath, "routes.txt")) &&
-               File.Exists(Path.Combine(_gtfsExtractPath, "trips.txt")) &&
-               File.Exists(Path.Combine(_gtfsExtractPath, "stop_times.txt"));
-    }
-
-    private bool GtfsFileIsFresh()
-    {
-        if (!GtfsFileExists()) return false;
-
-        // TODO: Consider switching to using UTC
-        var lastWriteTime = File.GetLastWriteTime(_gtfsZipPath);
-        var lastScheduledRefreshTime = new DateTime(
-            DateTime.Now.Year,
-            DateTime.Now.Month,
-            DateTime.Now.Day,
-            _options.DailyFetchHour,
-            _options.DailyFetchMinute,
-            _options.DailyFetchSecond
-        );
-
-        // GTFS files are fetched in the early morning, so
-        // the one fetched day before is still fresh during the night.
-        if (DateTime.Now.Hour < _options.DailyFetchHour)
-            lastScheduledRefreshTime = lastScheduledRefreshTime.AddDays(-1);
-
-        return lastWriteTime >= lastScheduledRefreshTime;
-    }
-
-    private bool GtfsExtractedFilesAreFresh()
-    {
-        if (!GtfsExtractedFilesExist()) return false;
-
-        // TODO: Consider switching to using UTC
-        var lastWriteTime = Directory.GetLastWriteTime(_gtfsExtractPath);
-        var lastScheduledRefreshTime = new DateTime(
-            DateTime.Now.Year,
-            DateTime.Now.Month,
-            DateTime.Now.Day,
-            _options.DailyFetchHour,
-            _options.DailyFetchMinute,
-            _options.DailyFetchSecond
-        );
-
-        // GTFS files are fetched in the early morning, so
-        // the one fetched day before is still fresh during the night.
-        if (DateTime.Now.Hour < _options.DailyFetchHour)
-            lastScheduledRefreshTime = lastScheduledRefreshTime.AddDays(-1);
-
-        return lastWriteTime >= lastScheduledRefreshTime;
-    }
+    private bool GtfsFileExists() => File.Exists(_gtfsZipPath);
 
     private async Task FetchGtfsAsync(CancellationToken cancellationToken)
     {
@@ -136,48 +79,39 @@ public class GtfsService(
         }
     }
 
+    private async Task RefreshGtfsAsync(CancellationToken cancellationToken)
+    {
+        await FetchGtfsAsync(cancellationToken);
+        await ExtractGtfsAsync(cancellationToken);
+        transitState.UpdateData(gtfsParserService.Parse());
+    }
+
+    private TimeSpan GetTaskDelay()
+    {
+        var now = DateTime.Now;
+        var target = new DateTime(
+            now.Year,
+            now.Month,
+            now.Day,
+            _options.DailyFetchHour,
+            _options.DailyFetchMinute,
+            _options.DailyFetchSecond
+        );
+
+        if (target < now)
+            target = target.AddDays(1);
+
+        logger.LogInformation("Next GTFS refetch scheduled at: {target}", target.ConvertToLocal());
+
+        return target - now;
+    }
+
     protected override async Task ExecuteAsync(CancellationToken cancellationToken)
     {
-        if (!GtfsFileIsFresh())
-            await FetchGtfsAsync(cancellationToken);
-        else
-            logger.LogInformation("GTFS file exists and is fresh. Fetching skipped.");
-
-        if (!GtfsExtractedFilesAreFresh())
-            await ExtractGtfsAsync(cancellationToken);
-        else
-            logger.LogInformation("GTFS extracted files exist. Extraction skipped.");
-
         while (!cancellationToken.IsCancellationRequested)
         {
-            logger.LogInformation("Task running at: {time}", DateTime.Now.ConvertToLocal());
-
-            // schedule next fetch
-
-            var now = DateTime.Now;
-            var target = new DateTime(
-                now.Year,
-                now.Month,
-                now.Day,
-                _options.DailyFetchHour,
-                _options.DailyFetchMinute,
-                _options.DailyFetchSecond
-            );
-
-            if (target < now)
-                target = target.AddDays(1);
-
-            logger.LogInformation("Next GTFS refetch scheduled at: {target}", target.ConvertToLocal());
-
-            // parse and update state
-
-            var parsedData = gtfsParserService.Parse();
-            transitState.UpdateData(parsedData);
-
-            // wait
-
-            var delay = target - now;
-            await Task.Delay(delay, cancellationToken);
+            await RefreshGtfsAsync(cancellationToken);
+            await Task.Delay(GetTaskDelay(), cancellationToken);
         }
     }
 }
