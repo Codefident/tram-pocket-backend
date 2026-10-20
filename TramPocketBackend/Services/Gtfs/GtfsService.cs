@@ -27,6 +27,7 @@ public class GtfsService(
 
         try
         {
+            // fetch data and stream it directly into the file
             using var response = await httpClient.GetAsync(
                 _options.KrkTUrl,
                 HttpCompletionOption.ResponseHeadersRead,

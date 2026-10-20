@@ -23,4 +23,7 @@ public class TransitStateData
     public Dictionary<string, List<StopTime>> StopTimesByTripId { get; set; } = new();
     public Dictionary<string, List<StopTime>> StopTimesByStopId { get; set; } = new();
     public Dictionary<string, StopTime> StopTimesByStopTripId { get; set; } = new();
+
+    // realtime trip updates (indexed by feed entity id)
+    public Dictionary<string, TransitRealtime.TripUpdate> TripUpdatesByEntityId { get; set; } = new();
 }

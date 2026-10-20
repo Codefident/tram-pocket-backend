@@ -9,13 +9,22 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddControllers();
 builder.Services.AddHttpClient();
+
+// - options
 builder.Services.Configure<GtfsOptions>(
     builder.Configuration.GetSection("Gtfs"));
 builder.Services.Configure<DeparturesOptions>(
     builder.Configuration.GetSection("Departures"));
+builder.Services.Configure<RealtimeOptions>(
+    builder.Configuration.GetSection("Realtime"));
+
+// - services
 builder.Services.AddHostedService<GtfsService>();
+builder.Services.AddHostedService<RealtimeService>();
 builder.Services.AddSingleton<GtfsParserService>();
 builder.Services.AddSingleton<DeparturesService>();
+
+// - misc
 builder.Services.AddSingleton<DataDirectoryInitializer>();
 builder.Services.AddSingleton<TransitState>();
 

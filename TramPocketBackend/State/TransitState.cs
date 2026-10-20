@@ -8,6 +8,11 @@ namespace TramPocketBackend.State;
 
 public sealed class TransitState : TransitStateData
 {
+    public void UpdateTripUpdates(Dictionary<string, TransitRealtime.TripUpdate> tripUpdates)
+    {
+        TripUpdatesByEntityId = tripUpdates;
+    }
+
     public void UpdateData(TransitStateData data)
     {
         StopsById = data.StopsById;
